@@ -168,10 +168,9 @@ const EvenOddChart = ({ data }) => {
 };
 
 const StatisticsPage = () => {
-  const [quinaStats, setQuinaStats] = useState(null);
-  const [duplaStats, setDuplaStats] = useState(null);
+  const [allStats, setAllStats] = useState({});
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("quina");
+  const [activeTab, setActiveTab] = useState("megasena");
 
   useEffect(() => {
     fetchAllStats();
@@ -180,13 +179,15 @@ const StatisticsPage = () => {
   const fetchAllStats = async () => {
     setLoading(true);
     try {
-      const [quinaRes, duplaRes] = await Promise.all([
-        axios.get(`${API}/lottery/quina/statistics`),
-        axios.get(`${API}/lottery/dupla_sena/statistics`)
-      ]);
+      const results = await Promise.all(
+        LOTTERY_TABS.map(tab => axios.get(`${API}/lottery/${tab.key}/statistics`))
+      );
       
-      setQuinaStats(quinaRes.data.data);
-      setDuplaStats(duplaRes.data.data);
+      const statsMap = {};
+      LOTTERY_TABS.forEach((tab, index) => {
+        statsMap[tab.key] = results[index].data.data;
+      });
+      setAllStats(statsMap);
     } catch (error) {
       console.error("Error fetching statistics:", error);
       toast.error("Erro ao carregar estatísticas");
@@ -195,9 +196,10 @@ const StatisticsPage = () => {
     }
   };
 
-  const stats = activeTab === "quina" ? quinaStats : duplaStats;
-  const primaryColor = activeTab === "quina" ? "#8b5cf6" : "#f43f5e";
-  const Icon = activeTab === "quina" ? Sparkles : Cherry;
+  const currentTab = LOTTERY_TABS.find(t => t.key === activeTab) || LOTTERY_TABS[0];
+  const stats = allStats[activeTab];
+  const primaryColor = currentTab.color;
+  const Icon = currentTab.icon;
 
   if (loading) {
     return (
