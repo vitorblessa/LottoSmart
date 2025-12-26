@@ -269,8 +269,9 @@ def calculate_statistics(results: List[Dict], lottery_type: str) -> Statistics:
 
 def generate_smart_bet(statistics: Statistics, lottery_type: str, strategy: str = "balanced") -> GeneratedBet:
     """Generate intelligent bet based on statistics"""
-    max_number = 80 if lottery_type == "quina" else 50
-    numbers_to_pick = 5 if lottery_type == "quina" else 6
+    config = LOTTERY_CONFIG.get(lottery_type, {"max_number": 60, "numbers_to_pick": 6})
+    max_number = config["max_number"]
+    numbers_to_pick = config["numbers_to_pick"]
     
     hot_nums = [h["number"] for h in statistics.hot_numbers]
     cold_nums = [c["number"] for c in statistics.cold_numbers]
@@ -282,21 +283,28 @@ def generate_smart_bet(statistics: Statistics, lottery_type: str, strategy: str 
     if strategy == "hot":
         # Focus on hot numbers
         pool = hot_nums[:20] if len(hot_nums) >= 20 else hot_nums + list(range(1, max_number + 1))
-        selected = random.sample(pool[:25], numbers_to_pick)
+        pool = list(set(pool))
+        selected = random.sample(pool[:max(25, numbers_to_pick + 5)], min(numbers_to_pick, len(pool)))
         explanation_parts.append("Foco em números quentes (mais frequentes)")
         
     elif strategy == "cold":
         # Focus on cold/delayed numbers
         pool = cold_nums + delayed_nums
-        pool = list(set(pool))[:25] if len(pool) >= 25 else pool + list(range(1, max_number + 1))
-        selected = random.sample(pool[:30], numbers_to_pick)
+        pool = list(set(pool))
+        if len(pool) < numbers_to_pick:
+            pool = pool + [n for n in range(1, max_number + 1) if n not in pool]
+        selected = random.sample(pool[:max(30, numbers_to_pick + 10)], min(numbers_to_pick, len(pool)))
         explanation_parts.append("Foco em números frios e atrasados (menos frequentes)")
         
     elif strategy == "balanced":
-        # Mix of hot, cold, and delayed
-        hot_pick = random.sample(hot_nums[:10], min(2, len(hot_nums)))
-        cold_pick = random.sample(cold_nums[:10], min(1, len(cold_nums)))
-        delayed_pick = random.sample(delayed_nums[:10], min(1, len(delayed_nums))) if delayed_nums else []
+        # Mix of hot, cold, and delayed - proportional to numbers_to_pick
+        hot_count = max(1, numbers_to_pick // 3)
+        cold_count = max(1, numbers_to_pick // 4)
+        delayed_count = max(1, numbers_to_pick // 5) if delayed_nums else 0
+        
+        hot_pick = random.sample(hot_nums[:15], min(hot_count, len(hot_nums))) if hot_nums else []
+        cold_pick = random.sample(cold_nums[:15], min(cold_count, len(cold_nums))) if cold_nums else []
+        delayed_pick = random.sample(delayed_nums[:10], min(delayed_count, len(delayed_nums))) if delayed_nums else []
         
         selected = list(set(hot_pick + cold_pick + delayed_pick))
         
@@ -323,14 +331,28 @@ def generate_smart_bet(statistics: Statistics, lottery_type: str, strategy: str 
         picks_per_range = numbers_to_pick // 3
         extra = numbers_to_pick % 3
         
-        selected = random.sample(low, picks_per_range + (1 if extra > 0 else 0))
-        selected += random.sample(medium, picks_per_range + (1 if extra > 1 else 0))
-        selected += random.sample(high, picks_per_range)
+        low_picks = min(picks_per_range + (1 if extra > 0 else 0), len(low))
+        medium_picks = min(picks_per_range + (1 if extra > 1 else 0), len(medium))
+        high_picks = min(numbers_to_pick - low_picks - medium_picks, len(high))
+        
+        selected = random.sample(low, low_picks)
+        selected += random.sample(medium, medium_picks)
+        selected += random.sample(high, high_picks)
         
         explanation_parts.append("Máxima cobertura nas faixas baixa, média e alta")
     
-    # Ensure even/odd balance
-    selected = sorted(selected)[:numbers_to_pick]
+    # Ensure we have exactly the right number of picks
+    selected = sorted(list(set(selected)))[:numbers_to_pick]
+    
+    # Fill if we don't have enough
+    while len(selected) < numbers_to_pick:
+        available = [n for n in range(1, max_number + 1) if n not in selected]
+        if available:
+            selected.append(random.choice(available))
+        else:
+            break
+    
+    selected = sorted(selected)
     even_count = sum(1 for n in selected if n % 2 == 0)
     odd_count = numbers_to_pick - even_count
     
