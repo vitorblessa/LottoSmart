@@ -551,8 +551,8 @@ async def get_bets(
     """Get saved bets history"""
     query = {}
     if lottery_type:
-        if lottery_type not in ["quina", "dupla_sena"]:
-            raise HTTPException(status_code=400, detail="Tipo de loteria inválido")
+        if lottery_type not in VALID_LOTTERY_TYPES:
+            raise HTTPException(status_code=400, detail=f"Tipo de loteria inválido. Use: {', '.join(VALID_LOTTERY_TYPES)}")
         query["lottery_type"] = lottery_type
     
     bets = await db.bets.find(query, {"_id": 0}).sort("created_at", -1).limit(limit).to_list(limit)
