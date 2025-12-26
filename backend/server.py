@@ -23,7 +23,17 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app
-app = FastAPI(title="Quina & Dupla Sena - Apostas Inteligentes")
+app = FastAPI(title="LottoSmart - Apostas Inteligentes")
+
+# Lottery configurations
+LOTTERY_CONFIG = {
+    "quina": {"max_number": 80, "numbers_to_pick": 5, "api_name": "quina"},
+    "dupla_sena": {"max_number": 50, "numbers_to_pick": 6, "api_name": "duplasena"},
+    "lotofacil": {"max_number": 25, "numbers_to_pick": 15, "api_name": "lotofacil"},
+    "megasena": {"max_number": 60, "numbers_to_pick": 6, "api_name": "megasena"}
+}
+
+VALID_LOTTERY_TYPES = list(LOTTERY_CONFIG.keys())
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
