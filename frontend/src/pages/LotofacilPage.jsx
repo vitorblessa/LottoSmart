@@ -190,15 +190,18 @@ const LotofacilPage = () => {
     
     if (num >= 1000000000) {
       const billions = num / 1000000000;
-      return `R$ ${billions % 1 === 0 ? billions.toFixed(0) : billions.toFixed(1).replace('.', ',')} Bilhão${billions >= 2 ? 'ões' : ''}`;
+      const formatted = billions % 1 === 0 ? billions.toFixed(0) : billions.toFixed(1).replace('.', ',');
+      return `R$ ${formatted} ${billions >= 2 ? 'Bilhões' : 'Bilhão'}`;
     }
     if (num >= 1000000) {
       const millions = num / 1000000;
-      return `R$ ${millions % 1 === 0 ? millions.toFixed(0) : millions.toFixed(1).replace('.', ',')} Milhão${millions >= 2 ? 'ões' : ''}`;
+      const formatted = millions % 1 === 0 ? millions.toFixed(0) : millions.toFixed(1).replace('.', ',');
+      return `R$ ${formatted} ${millions >= 2 ? 'Milhões' : 'Milhão'}`;
     }
     if (num >= 1000) {
       const thousands = num / 1000;
-      return `R$ ${thousands % 1 === 0 ? thousands.toFixed(0) : thousands.toFixed(1).replace('.', ',')} Mil`;
+      const formatted = thousands % 1 === 0 ? thousands.toFixed(0) : thousands.toFixed(1).replace('.', ',');
+      return `R$ ${formatted} Mil`;
     }
     
     return new Intl.NumberFormat("pt-BR", {
