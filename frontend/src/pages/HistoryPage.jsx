@@ -309,6 +309,8 @@ const HistoryPage = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todas</SelectItem>
+              <SelectItem value="megasena">Mega-Sena</SelectItem>
+              <SelectItem value="lotofacil">Lotofácil</SelectItem>
               <SelectItem value="quina">Quina</SelectItem>
               <SelectItem value="dupla_sena">Dupla Sena</SelectItem>
             </SelectContent>
