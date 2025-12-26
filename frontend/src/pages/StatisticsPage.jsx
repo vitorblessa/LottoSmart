@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { 
-  BarChart3, Sparkles, Cherry, RefreshCw, Flame, 
+  BarChart3, Sparkles, Cherry, Star, Clover, RefreshCw, Flame, 
   Snowflake, Target, TrendingUp, PieChart
 } from "lucide-react";
 import {
@@ -15,6 +15,13 @@ import {
 import axios from "axios";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+const LOTTERY_TABS = [
+  { key: "megasena", label: "Mega-Sena", icon: Star, color: "#22c55e" },
+  { key: "lotofacil", label: "Lotofácil", icon: Clover, color: "#14b8a6" },
+  { key: "quina", label: "Quina", icon: Sparkles, color: "#8b5cf6" },
+  { key: "dupla_sena", label: "Dupla Sena", icon: Cherry, color: "#f43f5e" }
+];
 
 const LotteryBall = ({ number, variant = "neutral", size = "md", frequency }) => {
   const sizeClasses = {
