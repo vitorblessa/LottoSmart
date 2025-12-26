@@ -155,6 +155,8 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/megasena" element={<MegaSenaPage />} />
+          <Route path="/lotofacil" element={<LotofacilPage />} />
           <Route path="/quina" element={<QuinaPage />} />
           <Route path="/dupla-sena" element={<DuplaSenaPage />} />
           <Route path="/historico" element={<HistoryPage />} />
