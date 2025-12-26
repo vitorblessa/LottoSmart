@@ -159,6 +159,16 @@ body {
     border: 1px solid rgba(244, 63, 94, 0.2);
 }
 
+.card-megasena {
+    background: linear-gradient(135deg, rgba(5, 46, 22, 0.8) 0%, rgba(2, 2, 4, 0.9) 100%);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.card-lotofacil {
+    background: linear-gradient(135deg, rgba(5, 46, 40, 0.8) 0%, rgba(2, 2, 4, 0.9) 100%);
+    border: 1px solid rgba(20, 184, 166, 0.2);
+}
+
 /* Neon glow effects */
 .glow-quina {
     box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
@@ -166,6 +176,14 @@ body {
 
 .glow-dupla {
     box-shadow: 0 0 20px rgba(225, 29, 72, 0.3);
+}
+
+.glow-megasena {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+}
+
+.glow-lotofacil {
+    box-shadow: 0 0 20px rgba(20, 184, 166, 0.3);
 }
 
 /* Button Styles */
