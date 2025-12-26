@@ -99,6 +99,38 @@ class LotteryAPITester:
         """Test Dupla Sena statistics"""
         return self.run_test("Dupla Sena Statistics", "GET", "lottery/dupla_sena/statistics", 200)
 
+    def test_megasena_latest(self):
+        """Test Mega-Sena latest result"""
+        return self.run_test("Mega-Sena Latest Result", "GET", "lottery/megasena/latest", 200)
+
+    def test_lotofacil_latest(self):
+        """Test Lotofácil latest result"""
+        return self.run_test("Lotofácil Latest Result", "GET", "lottery/lotofacil/latest", 200)
+
+    def test_megasena_statistics(self):
+        """Test Mega-Sena statistics"""
+        return self.run_test("Mega-Sena Statistics", "GET", "lottery/megasena/statistics", 200)
+
+    def test_lotofacil_statistics(self):
+        """Test Lotofácil statistics"""
+        return self.run_test("Lotofácil Statistics", "GET", "lottery/lotofacil/statistics", 200)
+
+    def test_megasena_next_draw(self):
+        """Test Mega-Sena next draw info"""
+        return self.run_test("Mega-Sena Next Draw", "GET", "lottery/megasena/next-draw", 200)
+
+    def test_lotofacil_next_draw(self):
+        """Test Lotofácil next draw info"""
+        return self.run_test("Lotofácil Next Draw", "GET", "lottery/lotofacil/next-draw", 200)
+
+    def test_megasena_history(self):
+        """Test Mega-Sena history"""
+        return self.run_test("Mega-Sena History", "GET", "lottery/megasena/history", 200, params={"limit": 5})
+
+    def test_lotofacil_history(self):
+        """Test Lotofácil history"""
+        return self.run_test("Lotofácil History", "GET", "lottery/lotofacil/history", 200, params={"limit": 5})
+
     def test_quina_next_draw(self):
         """Test Quina next draw info"""
         return self.run_test("Quina Next Draw", "GET", "lottery/quina/next-draw", 200)
