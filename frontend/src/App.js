@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import Dashboard from "./pages/Dashboard";
 import QuinaPage from "./pages/QuinaPage";
 import DuplaSenaPage from "./pages/DuplaSenaPage";
+import LotofacilPage from "./pages/LotofacilPage";
+import MegaSenaPage from "./pages/MegaSenaPage";
 import HistoryPage from "./pages/HistoryPage";
 import StatisticsPage from "./pages/StatisticsPage";
-import { Home, Sparkles, Cherry, History, BarChart3, Menu, X } from "lucide-react";
+import { Home, Sparkles, Cherry, Clover, Star, History, BarChart3, Menu, X } from "lucide-react";
 import "@/App.css";
 
 const NavItem = ({ to, icon: Icon, label, variant }) => {
