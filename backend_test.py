@@ -167,6 +167,26 @@ class LotteryAPITester:
             params={"lottery_type": "dupla_sena", "strategy": "hot", "count": 1}
         )
 
+    def test_generate_megasena_bets(self):
+        """Test generating Mega-Sena bets"""
+        return self.run_test(
+            "Generate Mega-Sena Bets", 
+            "POST", 
+            "bets/generate", 
+            200,
+            params={"lottery_type": "megasena", "strategy": "balanced", "count": 1}
+        )
+
+    def test_generate_lotofacil_bets(self):
+        """Test generating Lotofácil bets"""
+        return self.run_test(
+            "Generate Lotofácil Bets", 
+            "POST", 
+            "bets/generate", 
+            200,
+            params={"lottery_type": "lotofacil", "strategy": "coverage", "count": 1}
+        )
+
     def test_save_bet(self):
         """Test saving a bet"""
         bet_data = {
