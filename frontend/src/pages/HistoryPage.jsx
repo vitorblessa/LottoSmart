@@ -22,12 +22,19 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { 
-  History, Sparkles, Cherry, Trash2, RefreshCw, 
+  History, Sparkles, Cherry, Star, Clover, Trash2, RefreshCw, 
   CheckCircle2, XCircle, Search, Filter
 } from "lucide-react";
 import axios from "axios";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+const LOTTERY_CONFIG = {
+  quina: { icon: Sparkles, color: "violet", label: "Quina" },
+  dupla_sena: { icon: Cherry, color: "rose", label: "Dupla Sena" },
+  megasena: { icon: Star, color: "green", label: "Mega-Sena" },
+  lotofacil: { icon: Clover, color: "teal", label: "Lotofácil" }
+};
 
 const LotteryBall = ({ number, variant = "neutral", size = "md", matched = false }) => {
   const sizeClasses = {
