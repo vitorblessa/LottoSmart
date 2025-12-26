@@ -343,7 +343,19 @@ const Dashboard = () => {
           <Trophy className="w-5 h-5 text-yellow-400" />
           Próximos Sorteios
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <NextDrawCard 
+            lotteryType="megasena" 
+            title="Mega-Sena" 
+            icon={Star} 
+            variant="megasena" 
+          />
+          <NextDrawCard 
+            lotteryType="lotofacil" 
+            title="Lotofácil" 
+            icon={Clover} 
+            variant="lotofacil" 
+          />
           <NextDrawCard 
             lotteryType="quina" 
             title="Quina" 
@@ -365,7 +377,9 @@ const Dashboard = () => {
           <TrendingUp className="w-5 h-5 text-emerald-400" />
           Últimos Resultados
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <LatestResultCard lotteryType="megasena" title="Mega-Sena" variant="megasena" />
+          <LatestResultCard lotteryType="lotofacil" title="Lotofácil" variant="lotofacil" />
           <LatestResultCard lotteryType="quina" title="Quina" variant="quina" />
           <LatestResultCard lotteryType="dupla_sena" title="Dupla Sena" variant="dupla" />
         </div>
@@ -374,9 +388,9 @@ const Dashboard = () => {
       {/* Quick Stats */}
       <section>
         <h2 className="font-heading font-bold text-xl text-white/90 mb-4">
-          Estatísticas Rápidas - Quina
+          Estatísticas Rápidas - Mega-Sena
         </h2>
-        <QuickStats lotteryType="quina" />
+        <QuickStats lotteryType="megasena" />
       </section>
 
       {/* Recent Bets */}
