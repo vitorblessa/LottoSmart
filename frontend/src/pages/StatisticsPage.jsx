@@ -237,23 +237,19 @@ const StatisticsPage = () => {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="bg-zinc-900 border border-white/10 p-1">
-          <TabsTrigger 
-            value="quina" 
-            className="data-[state=active]:bg-violet-600 data-[state=active]:text-white"
-            data-testid="tab-quina"
-          >
-            <Sparkles className="w-4 h-4 mr-2" />
-            Quina
-          </TabsTrigger>
-          <TabsTrigger 
-            value="dupla_sena" 
-            className="data-[state=active]:bg-rose-600 data-[state=active]:text-white"
-            data-testid="tab-dupla"
-          >
-            <Cherry className="w-4 h-4 mr-2" />
-            Dupla Sena
-          </TabsTrigger>
+        <TabsList className="bg-zinc-900 border border-white/10 p-1 flex-wrap h-auto gap-1">
+          {LOTTERY_TABS.map(tab => (
+            <TabsTrigger 
+              key={tab.key}
+              value={tab.key} 
+              className="data-[state=active]:text-white"
+              style={{ '--active-bg': tab.color }}
+              data-testid={`tab-${tab.key}`}
+            >
+              <tab.icon className="w-4 h-4 mr-2" />
+              {tab.label}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
         <TabsContent value={activeTab} className="mt-6 space-y-6">
@@ -262,7 +258,7 @@ const StatisticsPage = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white font-heading">
                 <Icon className="w-5 h-5" style={{ color: primaryColor }} />
-                Resumo Estatístico
+                Resumo Estatístico - {currentTab.label}
               </CardTitle>
             </CardHeader>
             <CardContent>
