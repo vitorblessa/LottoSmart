@@ -1,0 +1,118 @@
+{
+  "identity": {
+    "name": "E1: The Anti-AI Designer",
+    "archetype": "Dark Luxury Data",
+    "vibe": "Professional, Analytical, High-Stakes, Neon-Noir",
+    "principles": [
+      "Fusion: Fintech Precision x Casino Glamour",
+      "Emotion: Confidence through Data",
+      "Contrast: Void Black vs. Laser Neon",
+      "Depth: Glassmorphism and Layered Light"
+    ]
+  },
+  "typography": {
+    "fonts": {
+      "heading": "Outfit",
+      "body": "Manrope",
+      "mono": "JetBrains Mono"
+    },
+    "imports": [
+      "https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap"
+    ],
+    "usage": {
+      "h1": "font-heading font-extrabold text-5xl tracking-tight text-white",
+      "h2": "font-heading font-bold text-3xl tracking-tight text-white/90",
+      "h3": "font-heading font-semibold text-xl tracking-normal text-white/80",
+      "body": "font-body text-base text-slate-400 leading-relaxed",
+      "numbers": "font-mono font-bold tracking-widest"
+    }
+  },
+  "colors": {
+    "palette": {
+      "background": "#020204",
+      "surface": "#09090B",
+      "surface_highlight": "#18181B",
+      "border": "#27272A",
+      "quina": {
+        "primary": "#7C3AED",
+        "glow": "#8B5CF6",
+        "gradient": "from-violet-600 to-indigo-600"
+      },
+      "dupla_sena": {
+        "primary": "#BE123C",
+        "glow": "#F43F5E",
+        "gradient": "from-rose-700 to-red-600"
+      },
+      "status": {
+        "hot": "#10B981",
+        "cold": "#3B82F6",
+        "delayed": "#F59E0B",
+        "success": "#059669"
+      }
+    },
+    "gradients": {
+      "quina_card": "bg-gradient-to-br from-[#1e1b4b] to-[#020204]",
+      "dupla_card": "bg-gradient-to-br from-[#4c0519] to-[#020204]",
+      "glass": "bg-white/5 backdrop-blur-xl border-white/10"
+    }
+  },
+  "layout": {
+    "grid_system": {
+      "dashboard": "grid grid-cols-1 md:grid-cols-12 gap-6 p-6",
+      "card_spans": {
+        "hero": "col-span-full md:col-span-8 lg:col-span-9",
+        "sidebar": "col-span-full md:col-span-4 lg:col-span-3",
+        "stat_card": "col-span-1 md:col-span-4 lg:col-span-3"
+      }
+    },
+    "spacing": {
+      "container_padding": "p-6 md:p-12",
+      "section_gap": "gap-8",
+      "internal_padding": "p-6"
+    }
+  },
+  "components": {
+    "lottery_ball": {
+      "style": "rounded-full flex items-center justify-center font-mono font-bold shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/10",
+      "quina_variant": "bg-gradient-to-br from-violet-500 to-indigo-700 text-white shadow-violet-500/20",
+      "dupla_variant": "bg-gradient-to-br from-rose-500 to-red-700 text-white shadow-rose-500/20",
+      "neutral_variant": "bg-zinc-800 text-zinc-400"
+    },
+    "cards": {
+      "base": "rounded-xl border border-white/5 bg-zinc-950/50 backdrop-blur-md shadow-xl",
+      "hover": "hover:border-white/10 hover:bg-zinc-900/80 transition-all duration-300"
+    },
+    "buttons": {
+      "primary": "h-12 px-8 rounded-lg bg-white text-black font-bold hover:bg-zinc-200 transition-transform active:scale-95",
+      "quina_action": "h-12 px-8 rounded-lg bg-violet-600 text-white font-bold hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.3)]",
+      "dupla_action": "h-12 px-8 rounded-lg bg-rose-600 text-white font-bold hover:bg-rose-500 shadow-[0_0_20px_rgba(225,29,72,0.3)]"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": "backdrop-blur-2xl bg-black/40 border border-white/10",
+    "neon_glow": "shadow-[0_0_10px_rgba(var(--color),0.5)]",
+    "noise_texture": "opacity-20 mix-blend-overlay pointer-events-none fixed inset-0 z-50 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"
+  },
+  "image_urls": {
+    "hero_abstract": "https://images.pexels.com/photos/2264245/pexels-photo-2264245.jpeg",
+    "prize_gold": "https://images.pexels.com/photos/15854584/pexels-photo-15854584.jpeg",
+    "data_bg": "https://images.pexels.com/photos/9667254/pexels-photo-9667254.jpeg"
+  },
+  "instructions_to_main_agent": [
+    "INSTALLATION: Run 'yarn add recharts' immediately. Charts are critical for this app.",
+    "THEME: Force Dark Mode. Do not implement a light mode toggle. The brand is 'Dark Luxury'.",
+    "FONTS: Add the Google Fonts import to 'index.css' immediately.",
+    "LAYOUT: Use the 'Control Room' grid for the dashboard. Dense data, but with breathing room (p-6 minimum).",
+    "COMPONENTS: Customize Shadcn components. Remove the default 'radius' if it makes things look too soft. Use 'rounded-xl' for cards but 'rounded-lg' for inner elements.",
+    "VISUALS: Use the 'lottery_ball' styles defined above. Do not use simple circles. Give them gradients and shadows.",
+    "DATA: When displaying stats (Hot/Cold), use the specific colors defined in 'colors.status'.",
+    "NOISE: Add the noise texture overlay to the entire app (in App.js or index.css) to give it a cinematic film grain look."
+  ],
+  "universal_guidelines": [
+    "Do not use 'Inter' font.",
+    "Do not use default Shadcn card styles without adding a glass effect.",
+    "Always add 'data-testid' to interactive elements.",
+    "Use 'sonner' for all notifications (bet saved, error, etc.).",
+    "Never use pure black (#000000) for backgrounds, use #020204 or #09090B."
+  ]
+}
