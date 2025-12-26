@@ -382,14 +382,14 @@ def get_bet_hash(lottery_type: str, numbers: List[int]) -> str:
 
 @api_router.get("/")
 async def root():
-    return {"message": "Quina & Dupla Sena - API de Apostas Inteligentes"}
+    return {"message": "LottoSmart - API de Apostas Inteligentes"}
 
 # Lottery Results
 @api_router.get("/lottery/{lottery_type}/latest")
 async def get_latest_result(lottery_type: str):
     """Get latest lottery result"""
-    if lottery_type not in ["quina", "dupla_sena"]:
-        raise HTTPException(status_code=400, detail="Tipo de loteria inválido")
+    if lottery_type not in VALID_LOTTERY_TYPES:
+        raise HTTPException(status_code=400, detail=f"Tipo de loteria inválido. Use: {', '.join(VALID_LOTTERY_TYPES)}")
     
     data = await fetch_lottery_data(lottery_type)
     if data:
@@ -422,8 +422,8 @@ async def get_lottery_history(
     limit: int = Query(20, ge=1, le=100)
 ):
     """Get lottery result history"""
-    if lottery_type not in ["quina", "dupla_sena"]:
-        raise HTTPException(status_code=400, detail="Tipo de loteria inválido")
+    if lottery_type not in VALID_LOTTERY_TYPES:
+        raise HTTPException(status_code=400, detail=f"Tipo de loteria inválido. Use: {', '.join(VALID_LOTTERY_TYPES)}")
     
     # First fetch latest to update cache
     await fetch_multiple_results(lottery_type, limit)
@@ -435,8 +435,8 @@ async def get_lottery_history(
 @api_router.get("/lottery/{lottery_type}/statistics")
 async def get_lottery_statistics(lottery_type: str):
     """Get statistical analysis of lottery numbers"""
-    if lottery_type not in ["quina", "dupla_sena"]:
-        raise HTTPException(status_code=400, detail="Tipo de loteria inválido")
+    if lottery_type not in VALID_LOTTERY_TYPES:
+        raise HTTPException(status_code=400, detail=f"Tipo de loteria inválido. Use: {', '.join(VALID_LOTTERY_TYPES)}")
     
     results = await fetch_multiple_results(lottery_type, 100)
     statistics = calculate_statistics(results, lottery_type)
