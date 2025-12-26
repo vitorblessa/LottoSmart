@@ -568,6 +568,23 @@ async def delete_bet(bet_id: str):
     
     return {"success": True, "message": "Aposta removida com sucesso"}
 
+@api_router.delete("/bets")
+async def delete_all_bets(lottery_type: Optional[str] = None):
+    """Delete all bets (optionally filtered by lottery type)"""
+    query = {}
+    if lottery_type:
+        if lottery_type not in VALID_LOTTERY_TYPES:
+            raise HTTPException(status_code=400, detail=f"Tipo de loteria inválido. Use: {', '.join(VALID_LOTTERY_TYPES)}")
+        query["lottery_type"] = lottery_type
+    
+    result = await db.bets.delete_many(query)
+    
+    return {
+        "success": True, 
+        "message": f"{result.deleted_count} aposta(s) removida(s) com sucesso",
+        "deleted_count": result.deleted_count
+    }
+
 # Bet Checking
 @api_router.post("/bets/check/{bet_id}")
 async def check_bet(bet_id: str, concurso: Optional[int] = None):
