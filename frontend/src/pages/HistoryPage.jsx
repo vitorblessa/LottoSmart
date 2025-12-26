@@ -209,6 +209,7 @@ const HistoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [checking, setChecking] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deletingAll, setDeletingAll] = useState(false);
   const [filter, setFilter] = useState("all");
   const [checkingAll, setCheckingAll] = useState(false);
 
@@ -227,6 +228,21 @@ const HistoryPage = () => {
       toast.error("Erro ao carregar histórico");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteAllBets = async () => {
+    setDeletingAll(true);
+    try {
+      const params = filter !== "all" ? `?lottery_type=${filter}` : "";
+      const response = await axios.delete(`${API}/bets${params}`);
+      toast.success(response.data.message);
+      setBets([]);
+    } catch (error) {
+      console.error("Error deleting all bets:", error);
+      toast.error("Erro ao limpar apostas");
+    } finally {
+      setDeletingAll(false);
     }
   };
 
