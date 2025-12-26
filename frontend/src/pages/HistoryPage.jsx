@@ -377,26 +377,42 @@ const HistoryPage = () => {
             <CardTitle className="text-white font-heading">Resumo</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-4 rounded-lg bg-zinc-800/50">
+            <div className="grid grid-cols-3 md:grid-cols-7 gap-3">
+              <div className="text-center p-3 rounded-lg bg-zinc-800/50">
                 <p className="text-2xl font-mono font-bold text-white">{bets.length}</p>
                 <p className="text-xs text-slate-500 uppercase">Total</p>
               </div>
-              <div className="text-center p-4 rounded-lg bg-violet-500/10">
+              <div className="text-center p-3 rounded-lg bg-green-500/10">
+                <p className="text-2xl font-mono font-bold text-green-400">
+                  {bets.filter(b => b.lottery_type === "megasena").length}
+                </p>
+                <p className="text-xs text-slate-500 uppercase">Mega-Sena</p>
+              </div>
+              <div className="text-center p-3 rounded-lg bg-teal-500/10">
+                <p className="text-2xl font-mono font-bold text-teal-400">
+                  {bets.filter(b => b.lottery_type === "lotofacil").length}
+                </p>
+                <p className="text-xs text-slate-500 uppercase">Lotofácil</p>
+              </div>
+              <div className="text-center p-3 rounded-lg bg-violet-500/10">
                 <p className="text-2xl font-mono font-bold text-violet-400">
                   {bets.filter(b => b.lottery_type === "quina").length}
                 </p>
                 <p className="text-xs text-slate-500 uppercase">Quina</p>
               </div>
-              <div className="text-center p-4 rounded-lg bg-rose-500/10">
+              <div className="text-center p-3 rounded-lg bg-rose-500/10">
                 <p className="text-2xl font-mono font-bold text-rose-400">
                   {bets.filter(b => b.lottery_type === "dupla_sena").length}
                 </p>
                 <p className="text-xs text-slate-500 uppercase">Dupla Sena</p>
               </div>
-              <div className="text-center p-4 rounded-lg bg-emerald-500/10">
+              <div className="text-center p-3 rounded-lg bg-emerald-500/10">
                 <p className="text-2xl font-mono font-bold text-emerald-400">{winnerCount}</p>
                 <p className="text-xs text-slate-500 uppercase">Premiadas</p>
+              </div>
+              <div className="text-center p-3 rounded-lg bg-amber-500/10">
+                <p className="text-2xl font-mono font-bold text-amber-400">{uncheckedCount}</p>
+                <p className="text-xs text-slate-500 uppercase">Pendentes</p>
               </div>
             </div>
           </CardContent>
