@@ -77,6 +77,8 @@ const Sidebar = ({ isOpen, onClose }) => {
           {/* Navigation */}
           <nav className="flex flex-col gap-2">
             <NavItem to="/" icon={Home} label="Dashboard" />
+            <NavItem to="/megasena" icon={Star} label="Mega-Sena" variant="megasena" />
+            <NavItem to="/lotofacil" icon={Clover} label="Lotofácil" variant="lotofacil" />
             <NavItem to="/quina" icon={Sparkles} label="Quina" variant="quina" />
             <NavItem to="/dupla-sena" icon={Cherry} label="Dupla Sena" variant="dupla" />
             <NavItem to="/historico" icon={History} label="Histórico" />
