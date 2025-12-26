@@ -70,8 +70,28 @@ const NextDrawCard = ({ lotteryType, title, icon: Icon, variant }) => {
     }
   };
 
-  const cardClass = variant === "quina" ? "card-quina" : "card-dupla";
-  const btnClass = variant === "quina" ? "btn-quina" : "btn-dupla";
+  const cardClassMap = {
+    quina: "card-quina",
+    dupla: "card-dupla",
+    megasena: "card-megasena",
+    lotofacil: "card-lotofacil"
+  };
+  const btnClassMap = {
+    quina: "btn-quina",
+    dupla: "btn-dupla",
+    megasena: "btn-megasena",
+    lotofacil: "btn-lotofacil"
+  };
+  const routeMap = {
+    quina: "/quina",
+    dupla: "/dupla-sena",
+    megasena: "/megasena",
+    lotofacil: "/lotofacil"
+  };
+  
+  const cardClass = cardClassMap[variant] || "card-quina";
+  const btnClass = btnClassMap[variant] || "btn-quina";
+  const route = routeMap[variant] || "/";
 
   if (loading) {
     return (
@@ -105,7 +125,7 @@ const NextDrawCard = ({ lotteryType, title, icon: Icon, variant }) => {
       <CardContent className="space-y-4">
         <div>
           <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Prêmio Estimado</p>
-          <p className="prize-value text-3xl">{formatCurrency(data?.valor_estimado || data?.valor_acumulado)}</p>
+          <p className="prize-value text-2xl md:text-3xl">{formatCurrency(data?.valor_estimado || data?.valor_acumulado)}</p>
         </div>
         
         <div className="flex items-center gap-4">
@@ -122,7 +142,7 @@ const NextDrawCard = ({ lotteryType, title, icon: Icon, variant }) => {
           </div>
         </div>
         
-        <Link to={variant === "quina" ? "/quina" : "/dupla-sena"}>
+        <Link to={route}>
           <Button className={`${btnClass} w-full mt-2`} data-testid={`goto-${lotteryType}-btn`}>
             Gerar Apostas <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
