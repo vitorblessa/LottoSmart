@@ -446,8 +446,8 @@ async def get_lottery_statistics(lottery_type: str):
 @api_router.get("/lottery/{lottery_type}/next-draw")
 async def get_next_draw(lottery_type: str):
     """Get information about next draw"""
-    if lottery_type not in ["quina", "dupla_sena"]:
-        raise HTTPException(status_code=400, detail="Tipo de loteria inválido")
+    if lottery_type not in VALID_LOTTERY_TYPES:
+        raise HTTPException(status_code=400, detail=f"Tipo de loteria inválido. Use: {', '.join(VALID_LOTTERY_TYPES)}")
     
     data = await fetch_lottery_data(lottery_type)
     if data:
@@ -467,13 +467,13 @@ async def get_next_draw(lottery_type: str):
 # Bet Generation
 @api_router.post("/bets/generate")
 async def generate_bets(
-    lottery_type: str = Query(..., description="quina ou dupla_sena"),
+    lottery_type: str = Query(..., description="quina, dupla_sena, lotofacil, megasena"),
     strategy: str = Query("balanced", description="hot, cold, balanced, coverage"),
     count: int = Query(1, ge=1, le=10)
 ):
     """Generate intelligent bets based on statistics"""
-    if lottery_type not in ["quina", "dupla_sena"]:
-        raise HTTPException(status_code=400, detail="Tipo de loteria inválido")
+    if lottery_type not in VALID_LOTTERY_TYPES:
+        raise HTTPException(status_code=400, detail=f"Tipo de loteria inválido. Use: {', '.join(VALID_LOTTERY_TYPES)}")
     
     if strategy not in ["hot", "cold", "balanced", "coverage"]:
         raise HTTPException(status_code=400, detail="Estratégia inválida")
@@ -513,8 +513,8 @@ async def generate_bets(
 @api_router.post("/bets")
 async def save_bet(bet: BetCreate):
     """Save a bet (prevent duplicates)"""
-    if bet.lottery_type not in ["quina", "dupla_sena"]:
-        raise HTTPException(status_code=400, detail="Tipo de loteria inválido")
+    if bet.lottery_type not in VALID_LOTTERY_TYPES:
+        raise HTTPException(status_code=400, detail=f"Tipo de loteria inválido. Use: {', '.join(VALID_LOTTERY_TYPES)}")
     
     bet_hash = get_bet_hash(bet.lottery_type, bet.numbers)
     
