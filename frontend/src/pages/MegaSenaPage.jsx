@@ -185,11 +185,26 @@ const MegaSenaPage = () => {
   };
 
   const formatCurrency = (value) => {
+    const num = value || 0;
+    
+    if (num >= 1000000000) {
+      const billions = num / 1000000000;
+      return `R$ ${billions % 1 === 0 ? billions.toFixed(0) : billions.toFixed(1).replace('.', ',')} Bilhão${billions >= 2 ? 'ões' : ''}`;
+    }
+    if (num >= 1000000) {
+      const millions = num / 1000000;
+      return `R$ ${millions % 1 === 0 ? millions.toFixed(0) : millions.toFixed(1).replace('.', ',')} Milhão${millions >= 2 ? 'ões' : ''}`;
+    }
+    if (num >= 1000) {
+      const thousands = num / 1000;
+      return `R$ ${thousands % 1 === 0 ? thousands.toFixed(0) : thousands.toFixed(1).replace('.', ',')} Mil`;
+    }
+    
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
       minimumFractionDigits: 0
-    }).format(value || 0);
+    }).format(num);
   };
 
   if (loading) {
