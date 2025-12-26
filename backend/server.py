@@ -507,7 +507,8 @@ async def save_bet(bet: BetCreate):
     await db.bets.insert_one(bet_doc)
     
     # Return without _id
-    del bet_doc["_id"] if "_id" in bet_doc else None
+    if "_id" in bet_doc:
+        del bet_doc["_id"]
     
     return {"success": True, "data": bet_doc}
 
