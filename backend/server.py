@@ -99,14 +99,12 @@ class BetCheckResult(BaseModel):
 
 async def fetch_lottery_data(lottery_type: str, concurso: Optional[int] = None) -> Optional[Dict]:
     """Fetch lottery data from Caixa API"""
-    base_urls = {
-        "quina": "https://servicebus2.caixa.gov.br/portaldeloterias/api/quina",
-        "dupla_sena": "https://servicebus2.caixa.gov.br/portaldeloterias/api/duplasena"
-    }
-    
-    url = base_urls.get(lottery_type)
-    if not url:
+    config = LOTTERY_CONFIG.get(lottery_type)
+    if not config:
         return None
+    
+    api_name = config["api_name"]
+    url = f"https://servicebus2.caixa.gov.br/portaldeloterias/api/{api_name}"
     
     if concurso:
         url = f"{url}/{concurso}"
