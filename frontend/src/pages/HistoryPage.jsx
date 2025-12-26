@@ -61,9 +61,10 @@ const BetCard = ({ bet, onCheck, onDelete, checking, deleting }) => {
     manual: "Manual"
   };
   
-  const isQuina = bet.lottery_type === "quina";
-  const cardClass = isQuina ? "bet-card-quina" : "bet-card-dupla";
-  const variant = isQuina ? "quina" : "dupla";
+  const config = LOTTERY_CONFIG[bet.lottery_type] || LOTTERY_CONFIG.quina;
+  const Icon = config.icon;
+  const cardClass = `bet-card-${bet.lottery_type === "dupla_sena" ? "dupla" : bet.lottery_type}`;
+  const variant = bet.lottery_type === "dupla_sena" ? "dupla" : bet.lottery_type;
   
   const formatDate = (dateStr) => {
     try {
@@ -85,13 +86,9 @@ const BetCard = ({ bet, onCheck, onDelete, checking, deleting }) => {
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            {isQuina ? (
-              <Sparkles className="w-4 h-4 text-violet-400" />
-            ) : (
-              <Cherry className="w-4 h-4 text-rose-400" />
-            )}
+            <Icon className={`w-4 h-4 text-${config.color}-400`} />
             <span className="font-medium text-white">
-              {isQuina ? "Quina" : "Dupla Sena"}
+              {config.label}
             </span>
             <span className={`strategy-badge strategy-${bet.strategy}`}>
               {strategyLabels[bet.strategy]}
