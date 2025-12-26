@@ -88,14 +88,19 @@ const DistributionChart = ({ data, title }) => {
   const COLORS = ["#10b981", "#f59e0b", "#ef4444"];
   
   const chartData = [
-    { name: "Baixa (1-26)", value: data.low },
-    { name: "Média (27-53)", value: data.medium },
-    { name: "Alta (54-80)", value: data.high }
+    { name: "Baixa (1-26)", value: data.low || 0 },
+    { name: "Média (27-53)", value: data.medium || 0 },
+    { name: "Alta (54-80)", value: data.high || 0 }
   ];
 
+  const hasData = chartData.some(d => d.value > 0);
+  if (!hasData) {
+    return <div className="h-64 flex items-center justify-center text-slate-500">Sem dados</div>;
+  }
+
   return (
-    <div className="h-64">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="h-64 w-full min-w-0">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
         <RechartsPie>
           <Pie
             data={chartData}
