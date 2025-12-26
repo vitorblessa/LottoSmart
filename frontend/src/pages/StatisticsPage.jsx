@@ -42,9 +42,13 @@ const FrequencyChart = ({ data, color }) => {
     percentage: item.percentage
   }));
 
+  if (!chartData || chartData.length === 0) {
+    return <div className="h-64 flex items-center justify-center text-slate-500">Sem dados</div>;
+  }
+
   return (
-    <div className="h-64">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="h-64 w-full min-w-0">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
         <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
           <XAxis 
