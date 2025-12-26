@@ -317,7 +317,7 @@ const HistoryPage = () => {
           </p>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Select value={filter} onValueChange={setFilter}>
             <SelectTrigger className="w-40 bg-zinc-900 border-white/10" data-testid="filter-select">
               <Filter className="w-4 h-4 mr-2" />
@@ -346,6 +346,48 @@ const HistoryPage = () => {
               )}
               Conferir Todas
             </Button>
+          )}
+          
+          {bets.length > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+                  data-testid="clear-all-btn"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Limpar Todas
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-zinc-900 border-white/10">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-white">Limpar todas as apostas?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação não pode ser desfeita. {filter === "all" 
+                      ? `Todas as ${bets.length} apostas serão permanentemente removidas.`
+                      : `Todas as ${bets.length} apostas de ${filter === "megasena" ? "Mega-Sena" : filter === "lotofacil" ? "Lotofácil" : filter === "quina" ? "Quina" : "Dupla Sena"} serão removidas.`
+                    }
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="bg-zinc-800 border-white/10 hover:bg-zinc-700">
+                    Cancelar
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={deleteAllBets}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    {deletingAll ? (
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Trash2 className="w-4 h-4 mr-2" />
+                    )}
+                    Limpar Todas
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
         </div>
       </div>
