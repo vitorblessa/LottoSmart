@@ -610,7 +610,7 @@ async def check_bet(bet_id: str, concurso: Optional[int] = None):
         elif match_count == 2:
             prize_tier = "Duque (2 acertos)"
             is_winner = True
-    else:  # dupla_sena
+    elif lottery_type == "dupla_sena":
         if match_count == 6:
             prize_tier = "Sena (6 acertos)"
             is_winner = True
@@ -622,6 +622,20 @@ async def check_bet(bet_id: str, concurso: Optional[int] = None):
             is_winner = True
         elif match_count == 3:
             prize_tier = "Terno (3 acertos)"
+            is_winner = True
+    elif lottery_type == "megasena":
+        if match_count == 6:
+            prize_tier = "Sena (6 acertos)"
+            is_winner = True
+        elif match_count == 5:
+            prize_tier = "Quina (5 acertos)"
+            is_winner = True
+        elif match_count == 4:
+            prize_tier = "Quadra (4 acertos)"
+            is_winner = True
+    elif lottery_type == "lotofacil":
+        if match_count >= 11:
+            prize_tier = f"{match_count} acertos"
             is_winner = True
     
     result = {
