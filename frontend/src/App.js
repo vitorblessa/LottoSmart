@@ -23,6 +23,12 @@ const NavItem = ({ to, icon: Icon, label, variant }) => {
     dupla: isActive 
       ? "bg-rose-600/20 text-rose-400 border border-rose-500/30" 
       : "text-slate-400 hover:text-rose-400 hover:bg-rose-600/10",
+    lotofacil: isActive 
+      ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30" 
+      : "text-slate-400 hover:text-emerald-400 hover:bg-emerald-600/10",
+    megasena: isActive 
+      ? "bg-green-600/20 text-green-400 border border-green-500/30" 
+      : "text-slate-400 hover:text-green-400 hover:bg-green-600/10",
     default: isActive 
       ? "bg-white/10 text-white border border-white/20" 
       : "text-slate-400 hover:text-white hover:bg-white/5"
