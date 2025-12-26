@@ -198,7 +198,8 @@ def calculate_statistics(results: List[Dict], lottery_type: str) -> Statistics:
             total_draws_analyzed=0
         )
     
-    max_number = 80 if lottery_type == "quina" else 50
+    config = LOTTERY_CONFIG.get(lottery_type, {"max_number": 60})
+    max_number = config["max_number"]
     all_numbers = []
     last_seen = {i: -1 for i in range(1, max_number + 1)}
     
