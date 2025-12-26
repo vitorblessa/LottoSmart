@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { 
-  Sparkles, Cherry, Trophy, Calendar, TrendingUp, 
+  Sparkles, Cherry, Star, Clover, Trophy, Calendar, TrendingUp, 
   ArrowRight, RefreshCw, Flame, Snowflake, Clock
 } from "lucide-react";
 import axios from "axios";
