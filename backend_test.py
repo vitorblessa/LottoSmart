@@ -255,20 +255,30 @@ def main():
     print("\n🎯 Testing Lottery Data Endpoints...")
     tester.test_quina_latest()
     tester.test_dupla_sena_latest()
+    tester.test_megasena_latest()
+    tester.test_lotofacil_latest()
     tester.test_quina_next_draw()
     tester.test_dupla_sena_next_draw()
+    tester.test_megasena_next_draw()
+    tester.test_lotofacil_next_draw()
     tester.test_quina_history()
     tester.test_dupla_sena_history()
+    tester.test_megasena_history()
+    tester.test_lotofacil_history()
     
     # Test statistics endpoints
     print("\n📊 Testing Statistics Endpoints...")
     tester.test_quina_statistics()
     tester.test_dupla_sena_statistics()
+    tester.test_megasena_statistics()
+    tester.test_lotofacil_statistics()
     
     # Test bet generation
     print("\n🎰 Testing Bet Generation...")
     tester.test_generate_quina_bets()
     tester.test_generate_dupla_sena_bets()
+    tester.test_generate_megasena_bets()
+    tester.test_generate_lotofacil_bets()
     
     # Test bet management
     print("\n💾 Testing Bet Management...")
