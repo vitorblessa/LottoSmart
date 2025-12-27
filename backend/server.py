@@ -374,8 +374,8 @@ def calculate_statistics(results: List[Dict], lottery_type: str) -> Statistics:
 
 # ===================== BET GENERATION SERVICE =====================
 
-def generate_smart_bet(statistics: Statistics, lottery_type: str, strategy: str = "balanced") -> GeneratedBet:
-    """Generate intelligent bet based on statistics"""
+def generate_smart_bet(statistics: Statistics, lottery_type: str, strategy: str = "balanced", pattern_analysis: Dict = None) -> GeneratedBet:
+    """Generate intelligent bet based on statistics and pattern analysis"""
     config = LOTTERY_CONFIG.get(lottery_type, {"max_number": 60, "numbers_to_pick": 6})
     max_number = config["max_number"]
     numbers_to_pick = config["numbers_to_pick"]
@@ -384,69 +384,239 @@ def generate_smart_bet(statistics: Statistics, lottery_type: str, strategy: str 
     cold_nums = [c["number"] for c in statistics.cold_numbers]
     delayed_nums = [d["number"] for d in statistics.delayed_numbers if isinstance(d["draws_since"], int)]
     
+    # Get pattern-based optimal values
+    optimal_even = pattern_analysis.get("optimal_even", numbers_to_pick // 2) if pattern_analysis else numbers_to_pick // 2
+    optimal_odd = numbers_to_pick - optimal_even
+    optimal_range = pattern_analysis.get("optimal_range", (numbers_to_pick // 3, numbers_to_pick // 3, numbers_to_pick // 3)) if pattern_analysis else None
+    sum_min = pattern_analysis.get("optimal_sum_min", 0) if pattern_analysis else 0
+    sum_max = pattern_analysis.get("optimal_sum_max", max_number * numbers_to_pick) if pattern_analysis else max_number * numbers_to_pick
+    
     selected = []
     explanation_parts = []
     
-    if strategy == "hot":
-        # Focus on hot numbers
-        pool = hot_nums[:20] if len(hot_nums) >= 20 else hot_nums + list(range(1, max_number + 1))
-        pool = list(set(pool))
-        selected = random.sample(pool[:max(25, numbers_to_pick + 5)], min(numbers_to_pick, len(pool)))
-        explanation_parts.append("Foco em números quentes (mais frequentes)")
+    # Calculate ranges
+    third = max_number // 3
+    low_range = list(range(1, third + 1))
+    mid_range = list(range(third + 1, 2 * third + 1))
+    high_range = list(range(2 * third + 1, max_number + 1))
+    
+    def validate_bet(nums):
+        """Validate bet against optimal patterns"""
+        if len(nums) != numbers_to_pick:
+            return False
+        nums = sorted(nums)
+        
+        # Check sum range (with tolerance)
+        total = sum(nums)
+        if sum_min > 0 and sum_max > 0:
+            if total < sum_min * 0.8 or total > sum_max * 1.2:
+                return False
+        
+        # Check even/odd balance (with tolerance of 1)
+        even = sum(1 for n in nums if n % 2 == 0)
+        if abs(even - optimal_even) > 2:
+            return False
+        
+        return True
+    
+    def generate_with_patterns():
+        """Generate numbers following winning patterns"""
+        result = []
+        
+        # Start with weighted selection from hot numbers (they appear more often)
+        hot_weight = hot_nums[:10] if hot_nums else []
+        
+        # Distribute across ranges based on optimal_range
+        if optimal_range:
+            target_low, target_mid, target_high = optimal_range
+        else:
+            target_low = target_mid = target_high = numbers_to_pick // 3
+        
+        # Adjust for rounding
+        remainder = numbers_to_pick - target_low - target_mid - target_high
+        if remainder > 0:
+            target_mid += remainder
+        
+        # Select from low range, preferring hot numbers
+        low_hot = [n for n in hot_weight if n in low_range]
+        low_other = [n for n in low_range if n not in low_hot]
+        low_pool = low_hot + low_other
+        if low_pool and target_low > 0:
+            result.extend(random.sample(low_pool, min(target_low, len(low_pool))))
+        
+        # Select from mid range
+        mid_hot = [n for n in hot_weight if n in mid_range]
+        mid_other = [n for n in mid_range if n not in mid_hot]
+        mid_pool = mid_hot + mid_other
+        if mid_pool and target_mid > 0:
+            available = [n for n in mid_pool if n not in result]
+            result.extend(random.sample(available, min(target_mid, len(available))))
+        
+        # Select from high range
+        high_hot = [n for n in hot_weight if n in high_range]
+        high_other = [n for n in high_range if n not in high_hot]
+        high_pool = high_hot + high_other
+        if high_pool and target_high > 0:
+            available = [n for n in high_pool if n not in result]
+            result.extend(random.sample(available, min(target_high, len(available))))
+        
+        # Fill remaining if needed
+        while len(result) < numbers_to_pick:
+            available = [n for n in range(1, max_number + 1) if n not in result]
+            if not available:
+                break
+            # Prefer hot numbers for filling
+            hot_available = [n for n in hot_weight if n in available]
+            if hot_available:
+                result.append(random.choice(hot_available))
+            else:
+                result.append(random.choice(available))
+        
+        # Balance even/odd
+        result = sorted(result)[:numbers_to_pick]
+        even_count = sum(1 for n in result if n % 2 == 0)
+        
+        # Try to adjust even/odd balance
+        attempts = 0
+        while abs(even_count - optimal_even) > 1 and attempts < 10:
+            if even_count > optimal_even:
+                # Replace an even with an odd
+                evens = [n for n in result if n % 2 == 0]
+                odds_available = [n for n in range(1, max_number + 1) if n % 2 == 1 and n not in result]
+                if evens and odds_available:
+                    result.remove(random.choice(evens))
+                    # Prefer hot odd numbers
+                    hot_odds = [n for n in odds_available if n in hot_weight]
+                    result.append(random.choice(hot_odds) if hot_odds else random.choice(odds_available))
+            else:
+                # Replace an odd with an even
+                odds = [n for n in result if n % 2 == 1]
+                evens_available = [n for n in range(1, max_number + 1) if n % 2 == 0 and n not in result]
+                if odds and evens_available:
+                    result.remove(random.choice(odds))
+                    hot_evens = [n for n in evens_available if n in hot_weight]
+                    result.append(random.choice(hot_evens) if hot_evens else random.choice(evens_available))
+            
+            even_count = sum(1 for n in result if n % 2 == 0)
+            attempts += 1
+        
+        return sorted(result)[:numbers_to_pick]
+    
+    if strategy == "smart":
+        # New: Pattern-based intelligent generation
+        best_bet = None
+        best_score = -1
+        
+        for _ in range(50):  # Try multiple times to find best bet
+            candidate = generate_with_patterns()
+            if validate_bet(candidate):
+                # Score based on hot number presence
+                score = sum(1 for n in candidate if n in hot_nums[:10])
+                if score > best_score:
+                    best_score = score
+                    best_bet = candidate
+        
+        selected = best_bet if best_bet else generate_with_patterns()
+        explanation_parts.append(f"Análise de padrões vencedores | {sum(1 for n in selected if n in hot_nums[:10])} números quentes")
+        
+    elif strategy == "hot":
+        # Focus on hot numbers with pattern validation
+        for _ in range(20):
+            pool = hot_nums[:15] + random.sample(range(1, max_number + 1), max_number // 4)
+            pool = list(set(pool))
+            candidate = random.sample(pool, min(numbers_to_pick, len(pool)))
+            if validate_bet(candidate):
+                selected = candidate
+                break
+        if not selected:
+            selected = random.sample(hot_nums[:20] if len(hot_nums) >= 20 else list(range(1, max_number + 1)), numbers_to_pick)
+        explanation_parts.append(f"Foco em números quentes | {sum(1 for n in selected if n in hot_nums[:10])} top 10")
         
     elif strategy == "cold":
-        # Focus on cold/delayed numbers
+        # Focus on cold/delayed numbers (these may be "due")
         pool = cold_nums + delayed_nums
         pool = list(set(pool))
         if len(pool) < numbers_to_pick:
             pool = pool + [n for n in range(1, max_number + 1) if n not in pool]
-        selected = random.sample(pool[:max(30, numbers_to_pick + 10)], min(numbers_to_pick, len(pool)))
-        explanation_parts.append("Foco em números frios e atrasados (menos frequentes)")
+        
+        for _ in range(20):
+            candidate = random.sample(pool[:max(30, numbers_to_pick + 10)], min(numbers_to_pick, len(pool)))
+            if validate_bet(candidate):
+                selected = candidate
+                break
+        if not selected:
+            selected = random.sample(pool, min(numbers_to_pick, len(pool)))
+        explanation_parts.append(f"Números frios/atrasados | Soma: {sum(selected)}")
         
     elif strategy == "balanced":
-        # Mix of hot, cold, and delayed - proportional to numbers_to_pick
-        hot_count = max(1, numbers_to_pick // 3)
-        cold_count = max(1, numbers_to_pick // 4)
-        delayed_count = max(1, numbers_to_pick // 5) if delayed_nums else 0
+        # Mix with pattern optimization
+        for _ in range(30):
+            candidate = generate_with_patterns()
+            if validate_bet(candidate):
+                selected = candidate
+                break
+        if not selected:
+            selected = generate_with_patterns()
         
-        hot_pick = random.sample(hot_nums[:15], min(hot_count, len(hot_nums))) if hot_nums else []
-        cold_pick = random.sample(cold_nums[:15], min(cold_count, len(cold_nums))) if cold_nums else []
-        delayed_pick = random.sample(delayed_nums[:10], min(delayed_count, len(delayed_nums))) if delayed_nums else []
-        
-        selected = list(set(hot_pick + cold_pick + delayed_pick))
-        
-        # Fill remaining with random balanced selection
-        remaining = numbers_to_pick - len(selected)
-        all_numbers = list(range(1, max_number + 1))
-        available = [n for n in all_numbers if n not in selected]
-        
-        while remaining > 0 and available:
-            n = random.choice(available)
-            selected.append(n)
-            available.remove(n)
-            remaining -= 1
-        
-        explanation_parts.append("Combinação equilibrada de números quentes, frios e atrasados")
+        hot_count = sum(1 for n in selected if n in hot_nums[:10])
+        cold_count = sum(1 for n in selected if n in cold_nums[:10])
+        explanation_parts.append(f"Equilibrado | {hot_count} quentes, {cold_count} frios")
         
     elif strategy == "coverage":
-        # Maximum coverage across ranges
-        third = max_number // 3
-        low = list(range(1, third + 1))
-        medium = list(range(third + 1, 2 * third + 1))
-        high = list(range(2 * third + 1, max_number + 1))
+        # Maximum coverage with pattern validation
+        for _ in range(20):
+            low_picks = min(optimal_range[0] if optimal_range else numbers_to_pick // 3, len(low_range))
+            mid_picks = min(optimal_range[1] if optimal_range else numbers_to_pick // 3, len(mid_range))
+            high_picks = numbers_to_pick - low_picks - mid_picks
+            
+            candidate = []
+            if low_picks > 0:
+                candidate.extend(random.sample(low_range, low_picks))
+            if mid_picks > 0:
+                candidate.extend(random.sample(mid_range, mid_picks))
+            if high_picks > 0 and len(high_range) >= high_picks:
+                candidate.extend(random.sample(high_range, high_picks))
+            
+            # Fill if needed
+            while len(candidate) < numbers_to_pick:
+                available = [n for n in range(1, max_number + 1) if n not in candidate]
+                candidate.append(random.choice(available))
+            
+            if validate_bet(candidate):
+                selected = candidate
+                break
         
-        picks_per_range = numbers_to_pick // 3
-        extra = numbers_to_pick % 3
+        if not selected:
+            selected = generate_with_patterns()
         
-        low_picks = min(picks_per_range + (1 if extra > 0 else 0), len(low))
-        medium_picks = min(picks_per_range + (1 if extra > 1 else 0), len(medium))
-        high_picks = min(numbers_to_pick - low_picks - medium_picks, len(high))
-        
-        selected = random.sample(low, low_picks)
-        selected += random.sample(medium, medium_picks)
-        selected += random.sample(high, high_picks)
-        
-        explanation_parts.append("Máxima cobertura nas faixas baixa, média e alta")
+        low_c = sum(1 for n in selected if n <= third)
+        mid_c = sum(1 for n in selected if third < n <= 2 * third)
+        high_c = sum(1 for n in selected if n > 2 * third)
+        explanation_parts.append(f"Cobertura: {low_c} baixos, {mid_c} médios, {high_c} altos")
+    
+    # Ensure we have exactly the right number of picks
+    selected = sorted(list(set(selected)))[:numbers_to_pick]
+    
+    # Fill if we don't have enough
+    while len(selected) < numbers_to_pick:
+        available = [n for n in range(1, max_number + 1) if n not in selected]
+        if available:
+            selected.append(random.choice(available))
+        else:
+            break
+    
+    selected = sorted(selected)
+    even_count = sum(1 for n in selected if n % 2 == 0)
+    odd_count = numbers_to_pick - even_count
+    
+    explanation_parts.append(f"Pares: {even_count}, Ímpares: {odd_count} | Soma: {sum(selected)}")
+    
+    return GeneratedBet(
+        lottery_type=lottery_type,
+        numbers=sorted(selected),
+        strategy=strategy,
+        explanation=" | ".join(explanation_parts)
+    )
     
     # Ensure we have exactly the right number of picks
     selected = sorted(list(set(selected)))[:numbers_to_pick]
