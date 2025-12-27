@@ -1014,7 +1014,13 @@ async def check_all_bets(lottery_type: Optional[str] = None):
         except Exception as e:
             logger.error(f"Error checking bet {bet['id']}: {e}")
     
-    return {"success": True, "data": results, "checked_count": len(results)}
+    return {
+        "success": True, 
+        "data": results, 
+        "checked_count": len(results),
+        "winners_count": winners,
+        "total_prize_value": total_prize
+    }
 
 # Include the router
 app.include_router(api_router)
