@@ -844,6 +844,31 @@ async def delete_all_bets(lottery_type: Optional[str] = None):
     }
 
 # Bet Checking
+def get_prize_value_from_result(data: Dict, lottery_type: str, match_count: int) -> Optional[float]:
+    """Extract prize value from API result based on match count"""
+    try:
+        # Different lotteries have different prize structures in the API
+        premiacoes = data.get("listaRateioPremio", [])
+        
+        if lottery_type == "megasena":
+            tier_map = {6: 0, 5: 1, 4: 2}  # Index in premiacoes list
+        elif lottery_type == "lotofacil":
+            tier_map = {15: 0, 14: 1, 13: 2, 12: 3, 11: 4}
+        elif lottery_type == "quina":
+            tier_map = {5: 0, 4: 1, 3: 2, 2: 3}
+        elif lottery_type == "dupla_sena":
+            tier_map = {6: 0, 5: 1, 4: 2, 3: 3}
+        else:
+            return None
+        
+        if match_count in tier_map:
+            idx = tier_map[match_count]
+            if idx < len(premiacoes):
+                return premiacoes[idx].get("valorPremio", 0)
+    except Exception:
+        pass
+    return None
+
 @api_router.post("/bets/check/{bet_id}")
 async def check_bet(bet_id: str, concurso: Optional[int] = None):
     """Check a bet against a specific draw result"""
@@ -852,6 +877,9 @@ async def check_bet(bet_id: str, concurso: Optional[int] = None):
         raise HTTPException(status_code=404, detail="Aposta não encontrada")
     
     lottery_type = bet["lottery_type"]
+    config = LOTTERY_CONFIG.get(lottery_type, {})
+    min_prize = config.get("min_prize", 0)
+    prize_tiers = config.get("prize_tiers", {})
     
     # Get result for the specified or latest concurso
     if concurso:
@@ -868,59 +896,41 @@ async def check_bet(bet_id: str, concurso: Optional[int] = None):
     matches = [n for n in bet_numbers if n in drawn_numbers]
     match_count = len(matches)
     
-    # Determine prize tier
+    # Check second draw for Dupla Sena
+    matches_second = []
+    if lottery_type == "dupla_sena":
+        drawn_second = [int(d) for d in data.get("listaDezenasSegundoSorteio", [])]
+        matches_second = [n for n in bet_numbers if n in drawn_second]
+    
+    # Determine prize tier and value
     prize_tier = None
+    prize_value = None
     is_winner = False
     
-    if lottery_type == "quina":
-        if match_count == 5:
-            prize_tier = "Quina (5 acertos)"
+    if match_count >= min_prize:
+        is_winner = True
+        prize_tier = prize_tiers.get(match_count, f"{match_count} acertos")
+        prize_value = get_prize_value_from_result(data, lottery_type, match_count)
+    
+    # For Dupla Sena, check if second draw is better
+    if lottery_type == "dupla_sena" and len(matches_second) >= min_prize:
+        if len(matches_second) > match_count:
+            matches = matches_second
+            match_count = len(matches_second)
             is_winner = True
-        elif match_count == 4:
-            prize_tier = "Quadra (4 acertos)"
-            is_winner = True
-        elif match_count == 3:
-            prize_tier = "Terno (3 acertos)"
-            is_winner = True
-        elif match_count == 2:
-            prize_tier = "Duque (2 acertos)"
-            is_winner = True
-    elif lottery_type == "dupla_sena":
-        if match_count == 6:
-            prize_tier = "Sena (6 acertos)"
-            is_winner = True
-        elif match_count == 5:
-            prize_tier = "Quina (5 acertos)"
-            is_winner = True
-        elif match_count == 4:
-            prize_tier = "Quadra (4 acertos)"
-            is_winner = True
-        elif match_count == 3:
-            prize_tier = "Terno (3 acertos)"
-            is_winner = True
-    elif lottery_type == "megasena":
-        if match_count == 6:
-            prize_tier = "Sena (6 acertos)"
-            is_winner = True
-        elif match_count == 5:
-            prize_tier = "Quina (5 acertos)"
-            is_winner = True
-        elif match_count == 4:
-            prize_tier = "Quadra (4 acertos)"
-            is_winner = True
-    elif lottery_type == "lotofacil":
-        if match_count >= 11:
-            prize_tier = f"{match_count} acertos"
-            is_winner = True
+            prize_tier = prize_tiers.get(match_count, f"{match_count} acertos") + " (2º sorteio)"
     
     result = {
         "concurso": data.get("numero", data.get("concurso")),
         "data": data.get("dataApuracao", data.get("data")),
         "drawn_numbers": drawn_numbers,
+        "drawn_numbers_second": [int(d) for d in data.get("listaDezenasSegundoSorteio", [])] if lottery_type == "dupla_sena" else None,
         "matches": matches,
         "match_count": match_count,
         "prize_tier": prize_tier,
+        "prize_value": prize_value,
         "is_winner": is_winner,
+        "min_to_win": min_prize,
         "checked_at": datetime.now(timezone.utc).isoformat()
     }
     
@@ -932,17 +942,19 @@ async def check_bet(bet_id: str, concurso: Optional[int] = None):
     
     return {
         "success": True,
-        "data": BetCheckResult(
-            bet_id=bet_id,
-            lottery_type=lottery_type,
-            numbers=bet_numbers,
-            concurso=result["concurso"],
-            drawn_numbers=drawn_numbers,
-            matches=matches,
-            match_count=match_count,
-            prize_tier=prize_tier,
-            is_winner=is_winner
-        ).model_dump()
+        "data": {
+            "bet_id": bet_id,
+            "lottery_type": lottery_type,
+            "numbers": bet_numbers,
+            "concurso": result["concurso"],
+            "drawn_numbers": drawn_numbers,
+            "matches": matches,
+            "match_count": match_count,
+            "prize_tier": prize_tier,
+            "prize_value": prize_value,
+            "is_winner": is_winner,
+            "min_to_win": min_prize
+        }
     }
 
 @api_router.post("/bets/check-all")
