@@ -25,12 +25,36 @@ db = client[os.environ['DB_NAME']]
 # Create the main app
 app = FastAPI(title="LottoSmart - Apostas Inteligentes")
 
-# Lottery configurations
+# Lottery configurations with prize tiers
 LOTTERY_CONFIG = {
-    "quina": {"max_number": 80, "numbers_to_pick": 5, "api_name": "quina"},
-    "dupla_sena": {"max_number": 50, "numbers_to_pick": 6, "api_name": "duplasena"},
-    "lotofacil": {"max_number": 25, "numbers_to_pick": 15, "api_name": "lotofacil"},
-    "megasena": {"max_number": 60, "numbers_to_pick": 6, "api_name": "megasena"}
+    "quina": {
+        "max_number": 80, 
+        "numbers_to_pick": 5, 
+        "api_name": "quina",
+        "prize_tiers": {5: "Quina", 4: "Quadra", 3: "Terno", 2: "Duque"},
+        "min_prize": 2
+    },
+    "dupla_sena": {
+        "max_number": 50, 
+        "numbers_to_pick": 6, 
+        "api_name": "duplasena",
+        "prize_tiers": {6: "Sena", 5: "Quina", 4: "Quadra", 3: "Terno"},
+        "min_prize": 3
+    },
+    "lotofacil": {
+        "max_number": 25, 
+        "numbers_to_pick": 15, 
+        "api_name": "lotofacil",
+        "prize_tiers": {15: "15 acertos", 14: "14 acertos", 13: "13 acertos", 12: "12 acertos", 11: "11 acertos"},
+        "min_prize": 11
+    },
+    "megasena": {
+        "max_number": 60, 
+        "numbers_to_pick": 6, 
+        "api_name": "megasena",
+        "prize_tiers": {6: "Sena", 5: "Quina", 4: "Quadra"},
+        "min_prize": 4
+    }
 }
 
 VALID_LOTTERY_TYPES = list(LOTTERY_CONFIG.keys())
