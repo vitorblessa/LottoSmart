@@ -137,8 +137,20 @@ const BetCard = ({ bet, onCheck, onDelete, checking, deleting }) => {
               </span>
             </div>
             {bet.result.is_winner && (
-              <p className="text-xs text-emerald-400/80 mt-1">
-                Parabéns! Você acertou!
+              <div className="mt-2 pt-2 border-t border-emerald-500/20">
+                <p className="text-xs text-emerald-400/80">
+                  🎉 Parabéns! Você ganhou!
+                </p>
+                {bet.result.prize_value && (
+                  <p className="text-lg font-bold text-emerald-400 mt-1">
+                    {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(bet.result.prize_value)}
+                  </p>
+                )}
+              </div>
+            )}
+            {!bet.result.is_winner && bet.result.min_to_win && (
+              <p className="text-xs text-slate-500 mt-1">
+                Mínimo para ganhar: {bet.result.min_to_win} acertos
               </p>
             )}
           </div>
