@@ -714,26 +714,27 @@ async def get_next_draw(lottery_type: str):
 @api_router.post("/bets/generate")
 async def generate_bets(
     lottery_type: str = Query(..., description="quina, dupla_sena, lotofacil, megasena"),
-    strategy: str = Query("balanced", description="hot, cold, balanced, coverage"),
+    strategy: str = Query("smart", description="smart, hot, cold, balanced, coverage"),
     count: int = Query(1, ge=1, le=10)
 ):
-    """Generate intelligent bets based on statistics"""
+    """Generate intelligent bets based on statistics and pattern analysis"""
     if lottery_type not in VALID_LOTTERY_TYPES:
         raise HTTPException(status_code=400, detail=f"Tipo de loteria inválido. Use: {', '.join(VALID_LOTTERY_TYPES)}")
     
-    if strategy not in ["hot", "cold", "balanced", "coverage"]:
-        raise HTTPException(status_code=400, detail="Estratégia inválida")
+    if strategy not in ["smart", "hot", "cold", "balanced", "coverage"]:
+        raise HTTPException(status_code=400, detail="Estratégia inválida. Use: smart, hot, cold, balanced, coverage")
     
-    # Get statistics
+    # Get statistics and pattern analysis
     results = await fetch_multiple_results(lottery_type, 100)
     statistics = calculate_statistics(results, lottery_type)
+    pattern_analysis = analyze_winning_patterns(results, lottery_type)
     
     bets = []
     attempts = 0
-    max_attempts = count * 3
+    max_attempts = count * 5
     
     while len(bets) < count and attempts < max_attempts:
-        bet = generate_smart_bet(statistics, lottery_type, strategy)
+        bet = generate_smart_bet(statistics, lottery_type, strategy, pattern_analysis)
         bet_hash = get_bet_hash(lottery_type, bet.numbers)
         
         # Check if this exact bet already exists in generated bets
@@ -744,6 +745,8 @@ async def generate_bets(
         
         attempts += 1
     
+    config = LOTTERY_CONFIG.get(lottery_type, {})
+    
     return {
         "success": True,
         "data": [b.model_dump() for b in bets],
@@ -752,6 +755,15 @@ async def generate_bets(
             "total_draws_analyzed": statistics.total_draws_analyzed,
             "top_hot_numbers": [h["number"] for h in statistics.hot_numbers[:5]],
             "top_cold_numbers": [c["number"] for c in statistics.cold_numbers[:5]]
+        },
+        "pattern_analysis": {
+            "optimal_even_odd": f"{pattern_analysis.get('optimal_even', '?')}/{pattern_analysis.get('optimal_odd', '?')}",
+            "optimal_sum_range": f"{pattern_analysis.get('optimal_sum_min', 0)} - {pattern_analysis.get('optimal_sum_max', 0)}",
+            "optimal_range_distribution": pattern_analysis.get('optimal_range', None)
+        },
+        "prize_info": {
+            "min_matches_to_win": config.get("min_prize", 0),
+            "prize_tiers": config.get("prize_tiers", {})
         }
     }
 
