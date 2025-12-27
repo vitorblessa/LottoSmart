@@ -210,6 +210,89 @@ async def store_result(lottery_type: str, data: Dict):
 
 # ===================== STATISTICS SERVICE =====================
 
+def analyze_winning_patterns(results: List[Dict], lottery_type: str) -> Dict:
+    """Analyze patterns from winning combinations"""
+    config = LOTTERY_CONFIG.get(lottery_type, {})
+    max_number = config.get("max_number", 60)
+    numbers_to_pick = config.get("numbers_to_pick", 6)
+    
+    patterns = {
+        "even_odd_patterns": [],  # Distribution of even/odd in winning combos
+        "range_patterns": [],      # Distribution across ranges
+        "sum_patterns": [],        # Sum of winning numbers
+        "consecutive_patterns": [], # Number of consecutive pairs
+        "decade_patterns": [],     # Distribution by decade
+        "repeat_from_last": [],    # Numbers that repeat from previous draw
+    }
+    
+    prev_dezenas = None
+    for result in results[:50]:  # Analyze last 50 draws
+        dezenas = result.get("dezenas", result.get("listaDezenas", []))
+        nums = sorted([int(d) for d in dezenas])
+        
+        if len(nums) != numbers_to_pick:
+            continue
+        
+        # Even/Odd pattern
+        even = sum(1 for n in nums if n % 2 == 0)
+        patterns["even_odd_patterns"].append(even)
+        
+        # Range pattern (low/medium/high)
+        third = max_number // 3
+        low = sum(1 for n in nums if n <= third)
+        med = sum(1 for n in nums if third < n <= 2 * third)
+        high = sum(1 for n in nums if n > 2 * third)
+        patterns["range_patterns"].append((low, med, high))
+        
+        # Sum pattern
+        patterns["sum_patterns"].append(sum(nums))
+        
+        # Consecutive pattern
+        consecutive = sum(1 for i in range(len(nums) - 1) if nums[i+1] - nums[i] == 1)
+        patterns["consecutive_patterns"].append(consecutive)
+        
+        # Decade pattern
+        decades = {}
+        for n in nums:
+            decade = (n - 1) // 10
+            decades[decade] = decades.get(decade, 0) + 1
+        patterns["decade_patterns"].append(decades)
+        
+        # Repeat from last
+        if prev_dezenas:
+            prev_nums = set(int(d) for d in prev_dezenas)
+            repeats = sum(1 for n in nums if n in prev_nums)
+            patterns["repeat_from_last"].append(repeats)
+        
+        prev_dezenas = dezenas
+    
+    # Calculate optimal ranges
+    analysis = {}
+    
+    if patterns["even_odd_patterns"]:
+        avg_even = sum(patterns["even_odd_patterns"]) / len(patterns["even_odd_patterns"])
+        analysis["optimal_even"] = round(avg_even)
+        analysis["optimal_odd"] = numbers_to_pick - round(avg_even)
+    
+    if patterns["sum_patterns"]:
+        sums = patterns["sum_patterns"]
+        analysis["optimal_sum_min"] = int(sum(sums) / len(sums) * 0.85)
+        analysis["optimal_sum_max"] = int(sum(sums) / len(sums) * 1.15)
+    
+    if patterns["consecutive_patterns"]:
+        analysis["avg_consecutive"] = sum(patterns["consecutive_patterns"]) / len(patterns["consecutive_patterns"])
+    
+    if patterns["range_patterns"]:
+        avg_low = sum(p[0] for p in patterns["range_patterns"]) / len(patterns["range_patterns"])
+        avg_med = sum(p[1] for p in patterns["range_patterns"]) / len(patterns["range_patterns"])
+        avg_high = sum(p[2] for p in patterns["range_patterns"]) / len(patterns["range_patterns"])
+        analysis["optimal_range"] = (round(avg_low), round(avg_med), round(avg_high))
+    
+    if patterns["repeat_from_last"]:
+        analysis["avg_repeats"] = sum(patterns["repeat_from_last"]) / len(patterns["repeat_from_last"])
+    
+    return analysis
+
 def calculate_statistics(results: List[Dict], lottery_type: str) -> Statistics:
     """Calculate statistical analysis of lottery numbers"""
     if not results:
