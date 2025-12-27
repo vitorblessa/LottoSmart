@@ -118,7 +118,7 @@ const DuplaSenaPage = () => {
   const [generating, setGenerating] = useState(false);
   const [saving, setSaving] = useState(false);
   
-  const [selectedStrategy, setSelectedStrategy] = useState("balanced");
+  const [selectedStrategy, setSelectedStrategy] = useState("smart");
   const [betCount, setBetCount] = useState("1");
   const [generatedBets, setGeneratedBets] = useState([]);
 
