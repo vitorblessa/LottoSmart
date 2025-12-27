@@ -967,21 +967,44 @@ async def check_all_bets(lottery_type: Optional[str] = None):
     unchecked_bets = await db.bets.find(query, {"_id": 0}).to_list(100)
     
     results = []
+    winners = 0
+    total_prize = 0
+    
     for bet in unchecked_bets:
         try:
+            lt = bet["lottery_type"]
+            config = LOTTERY_CONFIG.get(lt, {})
+            min_prize = config.get("min_prize", 0)
+            prize_tiers = config.get("prize_tiers", {})
+            
             # Get latest result for this lottery type
-            data = await fetch_lottery_data(bet["lottery_type"])
+            data = await fetch_lottery_data(lt)
             if data:
                 drawn_numbers = [int(d) for d in data.get("listaDezenas", data.get("dezenas", []))]
                 matches = [n for n in bet["numbers"] if n in drawn_numbers]
+                match_count = len(matches)
+                
+                is_winner = match_count >= min_prize
+                prize_tier = prize_tiers.get(match_count, f"{match_count} acertos") if is_winner else None
+                prize_value = get_prize_value_from_result(data, lt, match_count) if is_winner else None
                 
                 result = {
                     "bet_id": bet["id"],
+                    "lottery_type": lt,
                     "concurso": data.get("numero", data.get("concurso")),
                     "matches": matches,
-                    "match_count": len(matches)
+                    "match_count": match_count,
+                    "is_winner": is_winner,
+                    "prize_tier": prize_tier,
+                    "prize_value": prize_value,
+                    "min_to_win": min_prize
                 }
                 results.append(result)
+                
+                if is_winner:
+                    winners += 1
+                    if prize_value:
+                        total_prize += prize_value
                 
                 # Update bet
                 await db.bets.update_one(
