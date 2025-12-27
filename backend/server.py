@@ -617,37 +617,6 @@ def generate_smart_bet(statistics: Statistics, lottery_type: str, strategy: str 
         strategy=strategy,
         explanation=" | ".join(explanation_parts)
     )
-    
-    # Ensure we have exactly the right number of picks
-    selected = sorted(list(set(selected)))[:numbers_to_pick]
-    
-    # Fill if we don't have enough
-    while len(selected) < numbers_to_pick:
-        available = [n for n in range(1, max_number + 1) if n not in selected]
-        if available:
-            selected.append(random.choice(available))
-        else:
-            break
-    
-    selected = sorted(selected)
-    even_count = sum(1 for n in selected if n % 2 == 0)
-    odd_count = numbers_to_pick - even_count
-    
-    explanation_parts.append(f"Pares: {even_count}, Ímpares: {odd_count}")
-    
-    # Check for sequential numbers and adjust if too many
-    selected_sorted = sorted(selected)
-    sequential_count = sum(1 for i in range(len(selected_sorted) - 1) if selected_sorted[i+1] - selected_sorted[i] == 1)
-    
-    if sequential_count > 2:
-        explanation_parts.append("⚠️ Contém algumas sequências (pode ser ajustado)")
-    
-    return GeneratedBet(
-        lottery_type=lottery_type,
-        numbers=sorted(selected),
-        strategy=strategy,
-        explanation=" | ".join(explanation_parts)
-    )
 
 def get_bet_hash(lottery_type: str, numbers: List[int]) -> str:
     """Generate unique hash for a bet to prevent duplicates"""
