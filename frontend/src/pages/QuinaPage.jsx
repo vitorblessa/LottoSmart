@@ -376,7 +376,16 @@ const QuinaPage = () => {
           {/* Strategy Selection */}
           <div>
             <p className="text-sm text-slate-400 mb-3">Escolha sua estratégia:</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+              <StrategyCard
+                strategy="smart"
+                icon={Brain}
+                title="Inteligente"
+                description="Análise de padrões vencedores"
+                selected={selectedStrategy === "smart"}
+                onSelect={setSelectedStrategy}
+                recommended
+              />
               <StrategyCard
                 strategy="hot"
                 icon={Flame}
