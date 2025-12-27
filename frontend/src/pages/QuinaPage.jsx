@@ -12,7 +12,7 @@ import {
 import { toast } from "sonner";
 import { 
   Sparkles, Wand2, Save, RefreshCw, Flame, Snowflake, 
-  Target, Zap, Calendar, Trophy, CheckCircle2, XCircle
+  Target, Zap, Calendar, Trophy, Brain, CheckCircle2, XCircle
 } from "lucide-react";
 import axios from "axios";
 
