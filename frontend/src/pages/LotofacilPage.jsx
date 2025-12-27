@@ -33,8 +33,9 @@ const LotteryBall = ({ number, variant = "neutral", size = "md" }) => {
   );
 };
 
-const StrategyCard = ({ strategy, icon: Icon, title, description, selected, onSelect }) => {
+const StrategyCard = ({ strategy, icon: Icon, title, description, selected, onSelect, recommended }) => {
   const strategyColors = {
+    smart: "border-yellow-500/30 bg-yellow-500/10 hover:bg-yellow-500/20",
     hot: "border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20",
     cold: "border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20",
     balanced: "border-teal-500/30 bg-teal-500/10 hover:bg-teal-500/20",
@@ -42,6 +43,7 @@ const StrategyCard = ({ strategy, icon: Icon, title, description, selected, onSe
   };
   
   const iconColors = {
+    smart: "text-yellow-400",
     hot: "text-emerald-400",
     cold: "text-blue-400",
     balanced: "text-teal-400",
@@ -51,11 +53,16 @@ const StrategyCard = ({ strategy, icon: Icon, title, description, selected, onSe
   return (
     <button
       onClick={() => onSelect(strategy)}
-      className={`p-4 rounded-xl border transition-all duration-300 text-left w-full ${strategyColors[strategy]} ${
+      className={`p-4 rounded-xl border transition-all duration-300 text-left w-full relative ${strategyColors[strategy]} ${
         selected ? "ring-2 ring-white/30" : ""
       }`}
       data-testid={`strategy-${strategy}`}
     >
+      {recommended && (
+        <span className="absolute -top-2 -right-2 px-2 py-0.5 text-xs font-bold bg-yellow-500 text-black rounded-full">
+          RECOMENDADO
+        </span>
+      )}
       <div className="flex items-center gap-3 mb-2">
         <Icon className={`w-5 h-5 ${iconColors[strategy]}`} />
         <span className="font-semibold text-white">{title}</span>
@@ -67,6 +74,7 @@ const StrategyCard = ({ strategy, icon: Icon, title, description, selected, onSe
 
 const GeneratedBetCard = ({ bet, onSave, saving }) => {
   const strategyLabels = {
+    smart: "Inteligente",
     hot: "Números Quentes",
     cold: "Números Frios",
     balanced: "Equilibrado",
